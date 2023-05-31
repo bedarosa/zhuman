@@ -39,19 +39,20 @@ export class DialogflowService implements IAIQuestionAnswering {
     MediaContentType: string
   ): Promise<any> {
     //const filename = pathAudio;
-    const extensaoMedia = MediaContentType.split("/")[1];
+    //const extensaoMedia = MediaContentType.split("/")[1];
 
-    const session = await this.databaseService.getSessionOpened(
+    const sessionInProgress = await this.databaseService.getSessionOpened(
       telefoneCliente
     );
 
-    let sessionId;
     // verifica se o numero já tem uma sessionID em aberto
     // se tiver envia a mesmo
     // se não tiver cria uma e salva no banco atrelada ao numero como aberta
-    if (session) {
+
+    let sessionId;
+    if (sessionInProgress) {
       console.log("if");
-      sessionId = session.id;
+      sessionId = sessionInProgress.id;
     } else {
       console.log("else");
       sessionId = v4();

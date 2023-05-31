@@ -23,7 +23,6 @@ export class ConversationBotController implements IConversationBot {
     console.log(MediaContentType0); */
 
     if (MediaUrl0 || MediaContentType0) {
-      console.log("Audio");
       const audio = await this.downloadMedia.downloadAudio(
         MediaUrl0,
         From,
