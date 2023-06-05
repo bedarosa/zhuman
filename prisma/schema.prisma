@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,14 +7,1518 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model SessionId {
-  id    String  @id @default(uuid())
-  telefone  String
-  opened Int  @default(0) @db.TinyInt()
-  createdAt DateTime @default(now())
+model account_emailaddress {
+  id                        Int                         @id @default(autoincrement())
+  email                     String                      @unique(map: "email") @db.VarChar(254)
+  verified                  Boolean
+  primary                   Boolean
+  user_id                   Int
+  users_usuario             users_usuario               @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "account_emailaddress_user_id_2c513194_fk_users_usuario_id")
+  account_emailconfirmation account_emailconfirmation[]
+
+  @@index([user_id], map: "account_emailaddress_user_id_2c513194_fk_users_usuario_id")
 }
 
-model Customer_Trilha {
-  id    String  @id @default(uuid())
-  
+model account_emailconfirmation {
+  id                   Int                  @id @default(autoincrement())
+  created              DateTime             @db.DateTime(6)
+  sent                 DateTime?            @db.DateTime(6)
+  key                  String               @unique(map: "key") @db.VarChar(64)
+  email_address_id     Int
+  account_emailaddress account_emailaddress @relation(fields: [email_address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "account_emailconfirm_email_address_id_5b7f8c58_fk_account_e")
+
+  @@index([email_address_id], map: "account_emailconfirm_email_address_id_5b7f8c58_fk_account_e")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model activities_auditoria {
+  owner_name     String? @db.Text
+  deal_id        Float?
+  done_time      String? @db.Text
+  activitie_type String? @db.Text
+
+  @@ignore
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model admin_interface_theme {
+  id                                       Int     @id @default(autoincrement())
+  name                                     String  @unique(map: "admin_interface_theme_name_30bda70f_uniq") @db.VarChar(50)
+  active                                   Boolean
+  title                                    String  @db.VarChar(50)
+  title_visible                            Boolean
+  logo                                     String  @db.VarChar(100)
+  logo_visible                             Boolean
+  css_header_background_color              String  @db.VarChar(10)
+  title_color                              String  @db.VarChar(10)
+  css_header_text_color                    String  @db.VarChar(10)
+  css_header_link_color                    String  @db.VarChar(10)
+  css_header_link_hover_color              String  @db.VarChar(10)
+  css_module_background_color              String  @db.VarChar(10)
+  css_module_text_color                    String  @db.VarChar(10)
+  css_module_link_color                    String  @db.VarChar(10)
+  css_module_link_hover_color              String  @db.VarChar(10)
+  css_module_rounded_corners               Boolean
+  css_generic_link_color                   String  @db.VarChar(10)
+  css_generic_link_hover_color             String  @db.VarChar(10)
+  css_save_button_background_color         String  @db.VarChar(10)
+  css_save_button_background_hover_color   String  @db.VarChar(10)
+  css_save_button_text_color               String  @db.VarChar(10)
+  css_delete_button_background_color       String  @db.VarChar(10)
+  css_delete_button_background_hover_color String  @db.VarChar(10)
+  css_delete_button_text_color             String  @db.VarChar(10)
+  css                                      String  @db.LongText
+  list_filter_dropdown                     Boolean
+  related_modal_active                     Boolean
+  related_modal_background_color           String  @db.VarChar(10)
+  related_modal_rounded_corners            Boolean
+  logo_color                               String  @db.VarChar(10)
+  recent_actions_visible                   Boolean
+  favicon                                  String  @db.VarChar(100)
+  related_modal_background_opacity         String  @db.VarChar(5)
+  env_name                                 String  @db.VarChar(50)
+  env_visible_in_header                    Boolean
+  env_color                                String  @db.VarChar(10)
+  env_visible_in_favicon                   Boolean
+  related_modal_close_button_visible       Boolean
+  language_chooser_active                  Boolean
+  language_chooser_display                 String  @db.VarChar(10)
+  list_filter_sticky                       Boolean
+  form_pagination_sticky                   Boolean
+  form_submit_sticky                       Boolean
+  css_module_background_selected_color     String  @db.VarChar(10)
+  css_module_link_selected_color           String  @db.VarChar(10)
+  logo_max_height                          Int     @db.UnsignedSmallInt
+  logo_max_width                           Int     @db.UnsignedSmallInt
+}
+
+model announcements_announcement {
+  id                                 Int                                 @id @default(autoincrement())
+  title                              String                              @db.VarChar(50)
+  content                            String                              @db.LongText
+  creation_date                      DateTime                            @db.DateTime(6)
+  site_wide                          Boolean
+  members_only                       Boolean
+  dismissal_type                     Int
+  publish_start                      DateTime                            @db.DateTime(6)
+  publish_end                        DateTime?                           @db.DateTime(6)
+  redirect_to                        String?                             @db.VarChar(99)
+  category_id                        Int?
+  creator_id                         Int
+  announcements_announcementcategory announcements_announcementcategory? @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "announcements_announ_category_id_81df114b_fk_announcem")
+  users_usuario                      users_usuario                       @relation(fields: [creator_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "announcements_announ_creator_id_d9be5764_fk_users_usu")
+  announcements_dismissal            announcements_dismissal[]
+
+  @@index([category_id], map: "announcements_announ_category_id_81df114b_fk_announcem")
+  @@index([creator_id], map: "announcements_announ_creator_id_d9be5764_fk_users_usu")
+}
+
+model announcements_announcementcategory {
+  id                         Int                          @id @default(autoincrement())
+  name                       String                       @db.VarChar(25)
+  announcements_announcement announcements_announcement[]
+}
+
+model announcements_dismissal {
+  id                         Int                        @id @default(autoincrement())
+  dismissed_at               DateTime                   @db.DateTime(6)
+  announcement_id            Int
+  user_id                    Int
+  announcements_announcement announcements_announcement @relation(fields: [announcement_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "announcements_dismis_announcement_id_719fe978_fk_announcem")
+  users_usuario              users_usuario              @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "announcements_dismissal_user_id_927879ee_fk_users_usuario_id")
+
+  @@index([announcement_id], map: "announcements_dismis_announcement_id_719fe978_fk_announcem")
+  @@index([user_id], map: "announcements_dismissal_user_id_927879ee_fk_users_usuario_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model apolice_seguros {
+  apolice     String? @db.Text
+  assessor    String? @db.Text
+  cod_esp     String? @db.Text
+  instituicao String? @db.Text
+
+  @@ignore
+}
+
+model assessor_level {
+  id                     Int             @id @default(autoincrement())
+  level                  String?         @db.TinyText
+  order                  Int?            @unique(map: "assessor_level_order_fcd2ccbc_uniq")
+  min_value              Float?
+  p1_min                 Float?          @default(0.00000)
+  p1_var                 Float?          @default(0.00000)
+  p2_min                 Float?          @default(0.00000)
+  p2_var                 Float?          @default(0.00000)
+  goal_capt              Float           @default(0.00000)
+  goal_lig_c_day         BigInt          @default(0)
+  goal_lig_r_day         BigInt          @default(0)
+  goal_r1_day            BigInt          @default(0)
+  goal_r2_day            BigInt          @default(0)
+  goal_r2x1_lider_weekly BigInt          @default(0)
+  bonus_mensal           Float?          @default(0.00000)
+  name                   String?         @db.VarChar(99)
+  segmentation           Int?
+  icon_file              String?         @db.VarChar(255)
+  sector                 String          @db.VarChar(255)
+  users_usuario          users_usuario[]
+}
+
+model attachments_attachment {
+  id                  Int                 @id @default(autoincrement())
+  object_id           String              @db.VarChar(64)
+  attachment_file     String              @db.VarChar(100)
+  created             DateTime            @db.DateTime(6)
+  modified            DateTime            @db.DateTime(6)
+  content_type_id     Int
+  creator_id          Int
+  django_content_type django_content_type @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "attachments_attachme_content_type_id_35dd9d5d_fk_django_co")
+  users_usuario       users_usuario       @relation(fields: [creator_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "attachments_attachment_creator_id_d471ef83_fk_users_usuario_id")
+
+  @@index([content_type_id], map: "attachments_attachme_content_type_id_35dd9d5d_fk_django_co")
+  @@index([created], map: "attachments_attachment_created_96fbcd43")
+  @@index([creator_id], map: "attachments_attachment_creator_id_d471ef83_fk_users_usuario_id")
+  @@index([modified], map: "attachments_attachment_modified_1d39a3d7")
+  @@index([object_id], map: "attachments_attachment_object_id_102ce831")
+}
+
+model auth_group {
+  id                             Int                              @id @default(autoincrement())
+  name                           String                           @unique(map: "name") @db.VarChar(150)
+  auth_group_permissions         auth_group_permissions[]
+  guardian_groupobjectpermission guardian_groupobjectpermission[]
+  users_usuario_groups           users_usuario_groups[]
+}
+
+model auth_group_permissions {
+  id              Int             @id @default(autoincrement())
+  group_id        Int
+  permission_id   Int
+  auth_permission auth_permission @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_group_permissio_permission_id_84c5c92e_fk_auth_perm")
+  auth_group      auth_group      @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_group_permissions_group_id_b120cbf9_fk_auth_group_id")
+
+  @@unique([group_id, permission_id], map: "auth_group_permissions_group_id_permission_id_0cd325b0_uniq")
+  @@index([permission_id], map: "auth_group_permissio_permission_id_84c5c92e_fk_auth_perm")
+}
+
+model auth_permission {
+  id                                   Int                                    @id @default(autoincrement())
+  name                                 String                                 @db.VarChar(255)
+  content_type_id                      Int
+  codename                             String                                 @db.VarChar(100)
+  auth_group_permissions               auth_group_permissions[]
+  django_content_type                  django_content_type                    @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_permission_content_type_id_2f476e4b_fk_django_co")
+  guardian_groupobjectpermission       guardian_groupobjectpermission[]
+  guardian_userobjectpermission        guardian_userobjectpermission[]
+  sitetree_treeitem_access_permissions sitetree_treeitem_access_permissions[]
+  users_usuario_user_permissions       users_usuario_user_permissions[]
+
+  @@unique([content_type_id, codename], map: "auth_permission_content_type_id_codename_01ab375a_uniq")
+}
+
+model authtoken_token {
+  key           String        @id @db.VarChar(40)
+  created       DateTime      @db.DateTime(6)
+  user_id       Int           @unique(map: "user_id")
+  users_usuario users_usuario @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "authtoken_token_user_id_35299eff_fk_users_usuario_id")
+}
+
+model customer {
+  deal_id              BigInt?
+  origin_id            String?                @db.Text
+  name                 String?                @db.Text
+  phone                String?                @db.Text
+  email                String?                @db.Text
+  campaing             String?                @db.Text
+  creation_date        String?                @db.Text
+  won_date             String?                @db.Text
+  lost_date            String?                @db.Text
+  person_type_id       String?                @db.Text
+  state                String?                @db.Text
+  city                 String?                @db.Text
+  created_by_id        Float?
+  value                Float?
+  owner_name_to_id     String?                @db.Text
+  owner_id             Float?
+  stage_id             BigInt?
+  lost_reason          String?                @db.Text
+  platform             String?                @db.Text
+  status               String?                @db.Text
+  notes_count          BigInt?
+  corretora_banco      String?                @db.Text
+  profissao            String?                @db.Text
+  turno_contato        String?                @db.Text
+  faixa_patrimonio     String?                @db.Text
+  mautic_id            String?                @db.Text
+  won_by_id            Int?
+  lost_by_id           Int?
+  id                   BigInt                 @id
+  pj                   Int?                   @default(0) @db.TinyInt
+  pf                   Int?                   @default(0) @db.TinyInt
+  caixa                Int?
+  schedule_date        String?                @db.VarChar(45)
+  conversas_bot_trilha conversas_bot_trilha[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model customer_banks {
+  id          BigInt?
+  customer_id BigInt?
+  type        String? @db.Text
+  instituicao String? @db.Text
+  add_time    String? @db.Text
+
+  @@ignore
+}
+
+model customer_comments {
+  id          BigInt  @id @default(autoincrement())
+  user_id     BigInt?
+  customer_id BigInt?
+  add_time    String? @db.MediumText
+  update_time String? @db.MediumText
+  comment     String? @db.MediumText
+  type        String? @db.MediumText
+  deal_id     BigInt?
+  user_name   String? @db.MediumText
+}
+
+model customer_pj {
+  id          Int     @id @default(autoincrement())
+  customer_id Int?
+  caixa       Int?
+  faturamento Int?
+  atividade   String? @db.VarChar(45)
+  link        String? @db.VarChar(45)
+  cargo       String? @db.VarChar(45)
+  name_pj     String? @db.VarChar(45)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model django_admin_log {
+  id                  Int                  @id @default(autoincrement())
+  action_time         DateTime             @db.DateTime(6)
+  object_id           String?              @db.LongText
+  object_repr         String               @db.VarChar(200)
+  action_flag         Int                  @db.UnsignedSmallInt
+  change_message      String               @db.LongText
+  content_type_id     Int?
+  user_id             Int
+  django_content_type django_content_type? @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_admin_log_content_type_id_c4bce8eb_fk_django_co")
+  users_usuario       users_usuario        @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_admin_log_user_id_c564eba6_fk_users_usuario_id")
+
+  @@index([content_type_id], map: "django_admin_log_content_type_id_c4bce8eb_fk_django_co")
+  @@index([user_id], map: "django_admin_log_user_id_c564eba6_fk_users_usuario_id")
+}
+
+model django_content_type {
+  id                                                                                                Int                              @id @default(autoincrement())
+  app_label                                                                                         String                           @db.VarChar(100)
+  model                                                                                             String                           @db.VarChar(100)
+  attachments_attachment                                                                            attachments_attachment[]
+  auth_permission                                                                                   auth_permission[]
+  django_admin_log                                                                                  django_admin_log[]
+  guardian_groupobjectpermission                                                                    guardian_groupobjectpermission[]
+  guardian_userobjectpermission                                                                     guardian_userobjectpermission[]
+  notifications_notification_notifications_notification_actor_content_type_idTodjango_content_type  notifications_notification[]     @relation("notifications_notification_actor_content_type_idTodjango_content_type")
+  notifications_notification_notifications_notification_obj_content_type_idTodjango_content_type    notifications_notification[]     @relation("notifications_notification_obj_content_type_idTodjango_content_type")
+  notifications_notification_notifications_notification_target_content_type_idTodjango_content_type notifications_notification[]     @relation("notifications_notification_target_content_type_idTodjango_content_type")
+  reversion_version                                                                                 reversion_version[]
+  taggit_taggeditem                                                                                 taggit_taggeditem[]
+
+  @@unique([app_label, model], map: "django_content_type_app_label_model_76bd3d3b_uniq")
+}
+
+model django_migrations {
+  id      Int      @id @default(autoincrement())
+  app     String   @db.VarChar(255)
+  name    String   @db.VarChar(255)
+  applied DateTime @db.DateTime(6)
+}
+
+model django_rest_passwordreset_resetpasswordtoken {
+  created_at    DateTime      @db.DateTime(6)
+  key           String        @unique(map: "django_rest_passwordreset_resetpasswordtoken_key_f1b65873_uniq") @db.VarChar(64)
+  ip_address    String?       @db.Char(39)
+  user_agent    String        @db.VarChar(256)
+  user_id       Int
+  id            Int           @id @default(autoincrement())
+  users_usuario users_usuario @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_rest_password_user_id_e8015b11_fk_users_usu")
+
+  @@index([user_id], map: "django_rest_password_user_id_e8015b11_fk_users_usu")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model django_ses_sesstat {
+  id                Int      @id @default(autoincrement())
+  date              DateTime @unique(map: "date") @db.Date
+  delivery_attempts Int      @db.UnsignedInt
+  bounces           Int      @db.UnsignedInt
+  complaints        Int      @db.UnsignedInt
+  rejects           Int      @db.UnsignedInt
+}
+
+model django_session {
+  session_key  String   @id @db.VarChar(40)
+  session_data String   @db.LongText
+  expire_date  DateTime @db.DateTime(6)
+
+  @@index([expire_date], map: "django_session_expire_date_a5c62663")
+}
+
+model django_site {
+  id     Int    @id @default(autoincrement())
+  domain String @unique(map: "django_site_domain_a2e37b91_uniq") @db.VarChar(100)
+  name   String @db.VarChar(50)
+}
+
+model django_summernote_attachment {
+  id       Int      @id @default(autoincrement())
+  name     String?  @db.VarChar(255)
+  file     String   @db.VarChar(100)
+  uploaded DateTime @db.DateTime(6)
+}
+
+model goals_rules {
+  id          Int     @id @default(autoincrement())
+  name        String? @db.VarChar(45)
+  slug        String? @db.VarChar(45)
+  role_id     Int?
+  goal_id     Int?
+  fixed_value Float?
+  perc_value  Float?
+  range       String? @db.VarChar(45)
+  revenue     Int?    @default(0)
+}
+
+model goals_types {
+  id        Int      @id @default(autoincrement())
+  name      String?  @db.VarChar(45)
+  slug      String?  @db.VarChar(45)
+  is_active Boolean?
+}
+
+model guardian_groupobjectpermission {
+  id                  Int                 @id @default(autoincrement())
+  object_pk           String              @db.VarChar(255)
+  content_type_id     Int
+  group_id            Int
+  permission_id       Int
+  django_content_type django_content_type @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "guardian_groupobject_content_type_id_7ade36b8_fk_django_co")
+  auth_group          auth_group          @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "guardian_groupobject_group_id_4bbbfb62_fk_auth_grou")
+  auth_permission     auth_permission     @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "guardian_groupobject_permission_id_36572738_fk_auth_perm")
+
+  @@unique([group_id, permission_id, object_pk], map: "guardian_groupobjectperm_group_id_permission_id_o_3f189f7c_uniq")
+  @@index([content_type_id, object_pk], map: "guardian_gr_content_ae6aec_idx")
+  @@index([permission_id], map: "guardian_groupobject_permission_id_36572738_fk_auth_perm")
+}
+
+model guardian_userobjectpermission {
+  id                  Int                 @id @default(autoincrement())
+  object_pk           String              @db.VarChar(255)
+  content_type_id     Int
+  permission_id       Int
+  user_id             Int
+  django_content_type django_content_type @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "guardian_userobjectp_content_type_id_2e892405_fk_django_co")
+  auth_permission     auth_permission     @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "guardian_userobjectp_permission_id_71807bfc_fk_auth_perm")
+  users_usuario       users_usuario       @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "guardian_userobjectp_user_id_d5c1e964_fk_users_usu")
+
+  @@unique([user_id, permission_id, object_pk], map: "guardian_userobjectpermi_user_id_permission_id_ob_b0b3d2fc_uniq")
+  @@index([content_type_id, object_pk], map: "guardian_us_content_179ed2_idx")
+  @@index([permission_id], map: "guardian_userobjectp_permission_id_71807bfc_fk_auth_perm")
+}
+
+model info__updated_tables {
+  table_id     String    @id @db.VarChar(255)
+  updated_time DateTime? @db.DateTime(0)
+}
+
+model intranet_customer_pj {
+  id          Int     @id @default(autoincrement())
+  customer_id Int?
+  caixa       Int?
+  faturamento Int?
+  atividade   String? @db.VarChar(45)
+  link        String? @db.VarChar(45)
+  cargo       String? @db.VarChar(45)
+  name_pj     String? @db.VarChar(45)
+
+  @@map("intranet.customer_pj")
+}
+
+model ir_trade {
+  id         Int       @id @default(autoincrement())
+  data       DateTime? @db.DateTime(0)
+  cliente    String?   @db.Text
+  desconto   Float?
+  valor      Float?
+  solicitado Int?      @db.TinyInt
+  aprovado   Int?      @db.TinyInt
+}
+
+model messaging_message {
+  id               Int              @id @default(autoincrement())
+  sent_at          DateTime         @db.DateTime(6)
+  content          String           @db.LongText
+  sender_id        Int
+  thread_id        Int
+  users_usuario    users_usuario    @relation(fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "messaging_message_sender_id_7a7088e6_fk_users_usuario_id")
+  messaging_thread messaging_thread @relation(fields: [thread_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "messaging_message_thread_id_f689027f_fk_messaging_thread_id")
+
+  @@index([sender_id], map: "messaging_message_sender_id_7a7088e6_fk_users_usuario_id")
+  @@index([thread_id], map: "messaging_message_thread_id_f689027f_fk_messaging_thread_id")
+}
+
+model messaging_thread {
+  id                   Int                    @id @default(autoincrement())
+  subject              String                 @db.VarChar(150)
+  messaging_message    messaging_message[]
+  messaging_userthread messaging_userthread[]
+}
+
+model messaging_userthread {
+  id               Int              @id @default(autoincrement())
+  unread           Boolean
+  deleted          Boolean
+  thread_id        Int
+  user_id          Int
+  messaging_thread messaging_thread @relation(fields: [thread_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "messaging_userthread_thread_id_9d4b7550_fk_messaging_thread_id")
+  users_usuario    users_usuario    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "messaging_userthread_user_id_14085ae6_fk_users_usuario_id")
+
+  @@index([thread_id], map: "messaging_userthread_thread_id_9d4b7550_fk_messaging_thread_id")
+  @@index([user_id], map: "messaging_userthread_user_id_14085ae6_fk_users_usuario_id")
+}
+
+model my_cache_table {
+  cache_key String   @id @db.VarChar(255)
+  value     String   @db.LongText
+  expires   DateTime @db.DateTime(6)
+
+  @@index([expires], map: "my_cache_table_expires")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model notifications_notification {
+  id                                                                                         Int                                 @id @default(autoincrement())
+  actor_object_id                                                                            Int?                                @db.UnsignedInt
+  actor_text                                                                                 String?                             @db.VarChar(50)
+  actor_url_text                                                                             String?                             @db.VarChar(200)
+  verb                                                                                       String                              @db.VarChar(255)
+  description                                                                                String?                             @db.VarChar(255)
+  nf_type_id                                                                                 Int?
+  target_object_id                                                                           Int?                                @db.UnsignedInt
+  target_text                                                                                String?                             @db.VarChar(50)
+  target_url_text                                                                            String?                             @db.VarChar(200)
+  obj_object_id                                                                              Int?                                @db.UnsignedInt
+  obj_text                                                                                   String?                             @db.VarChar(50)
+  obj_url_text                                                                               String?                             @db.VarChar(200)
+  extra                                                                                      String?                             @db.LongText
+  created                                                                                    DateTime                            @db.DateTime(6)
+  read                                                                                       Boolean
+  deleted                                                                                    Boolean
+  actor_content_type_id                                                                      Int?
+  obj_content_type_id                                                                        Int?
+  recipient_id                                                                               Int
+  target_content_type_id                                                                     Int?
+  django_content_type_notifications_notification_actor_content_type_idTodjango_content_type  django_content_type?                @relation("notifications_notification_actor_content_type_idTodjango_content_type", fields: [actor_content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "notifications_notifi_actor_content_type_i_0c69d7b7_fk_django_co")
+  notifications_notificationcategory                                                         notifications_notificationcategory? @relation(fields: [nf_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "notifications_notifi_nf_type_id_466389b1_fk_notificat")
+  django_content_type_notifications_notification_obj_content_type_idTodjango_content_type    django_content_type?                @relation("notifications_notification_obj_content_type_idTodjango_content_type", fields: [obj_content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "notifications_notifi_obj_content_type_id_85e4a39a_fk_django_co")
+  users_usuario                                                                              users_usuario                       @relation(fields: [recipient_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "notifications_notifi_recipient_id_d055f3f0_fk_users_usu")
+  django_content_type_notifications_notification_target_content_type_idTodjango_content_type django_content_type?                @relation("notifications_notification_target_content_type_idTodjango_content_type", fields: [target_content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "notifications_notifi_target_content_type__ccb24d88_fk_django_co")
+
+  @@index([actor_content_type_id], map: "notifications_notifi_actor_content_type_i_0c69d7b7_fk_django_co")
+  @@index([obj_content_type_id], map: "notifications_notifi_obj_content_type_id_85e4a39a_fk_django_co")
+  @@index([recipient_id], map: "notifications_notifi_recipient_id_d055f3f0_fk_users_usu")
+  @@index([target_content_type_id], map: "notifications_notifi_target_content_type__ccb24d88_fk_django_co")
+  @@index([nf_type_id], map: "notifications_notification_nf_type_id_466389b1")
+}
+
+model notifications_notificationcategory {
+  id                         Int                          @id @default(autoincrement())
+  name                       String?                      @db.VarChar(50)
+  application                String?                      @db.VarChar(50)
+  notifications_notification notifications_notification[]
+}
+
+model oauth2_factorial {
+  id            Int      @id @default(autoincrement())
+  access_token  String   @db.VarChar(45)
+  token_type    String   @db.VarChar(45)
+  expires_in    Int
+  refresh_token String   @db.VarChar(45)
+  scope         String   @db.VarChar(12)
+  created_at    DateTime @db.DateTime(0)
+}
+
+model opportunities {
+  id       BigInt @id @default(autoincrement())
+  creator  Int?
+  owner    Int?
+  executor Int?
+  details  Json?
+  stage    Int?   @default(1)
+  priority Int?   @default(1)
+  account  Int?
+}
+
+model opportunities_historicalopportunity {
+  id                    BigInt
+  created_time          DateTime  @db.DateTime(6)
+  completed_time        DateTime? @db.DateTime(6)
+  net                   Float?
+  ativo                 String?   @db.VarChar(240)
+  customer              Int?
+  customer_name         String?   @db.VarChar(240)
+  details               Json
+  priority              Int?
+  heat                  Int?
+  history_id            Int       @id @default(autoincrement())
+  history_date          DateTime  @db.DateTime(6)
+  history_change_reason String?   @db.VarChar(100)
+  history_type          String    @db.VarChar(1)
+  account_id            BigInt?
+  creator_id            Int?
+  executor_id           Int?
+  history_user_id       Int?
+  owner_id              Int?
+  product_label_id      String?   @db.VarChar(99)
+  stage_id              Int?
+  step_id               Int?
+  description           String?   @db.VarChar(500)
+  deleted               Boolean   @default(false)
+}
+
+model opportunities_historicalopportunitycomment {
+  id                    Int
+  comment               String?  @db.VarChar(5000)
+  last_update           DateTime @db.DateTime(6)
+  history_id            Int      @id @default(autoincrement())
+  history_date          DateTime @db.DateTime(6)
+  history_change_reason String?  @db.VarChar(100)
+  history_type          String   @db.VarChar(1)
+  author_id             Int?
+  history_user_id       Int?
+  opportunity_id        BigInt?
+}
+
+model opportunities_historicalopportunitypriority {
+  id                    Int
+  name                  String         @db.VarChar(140)
+  history_id            Int            @id @default(autoincrement())
+  history_date          DateTime       @db.DateTime(6)
+  history_change_reason String?        @db.VarChar(100)
+  history_type          String         @db.VarChar(1)
+  history_user_id       Int?
+  users_usuario         users_usuario? @relation(fields: [history_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "opportunities_histor_history_user_id_204fb110_fk_users_usu")
+
+  @@index([history_user_id], map: "opportunities_histor_history_user_id_204fb110_fk_users_usu")
+  @@index([id], map: "opportunities_historicalopportunitypriority_id_9d38a83c")
+}
+
+model opportunities_historicalopportunitystage {
+  id                    Int
+  name                  String   @db.VarChar(140)
+  complete              Boolean
+  history_id            Int      @id @default(autoincrement())
+  history_date          DateTime @db.DateTime(6)
+  history_change_reason String?  @db.VarChar(100)
+  history_type          String   @db.VarChar(1)
+  history_user_id       Int?
+}
+
+model opportunities_historicalopportunitystep {
+  id                    Int
+  step                  Int
+  name                  String   @db.VarChar(140)
+  history_id            Int      @id @default(autoincrement())
+  history_date          DateTime @db.DateTime(6)
+  history_change_reason String?  @db.VarChar(100)
+  history_type          String   @db.VarChar(1)
+  history_user_id       Int?
+  sector_id             Int?
+  stage_id              Int?
+}
+
+model opportunities_opportunity {
+  id               BigInt    @id @default(autoincrement())
+  created_time     DateTime  @db.DateTime(6)
+  completed_time   DateTime? @db.DateTime(6)
+  net              Float?
+  ativo            String?   @db.VarChar(240)
+  customer         Int?
+  customer_name    String?   @db.VarChar(240)
+  details          Json
+  priority         Int?
+  heat             Int?
+  account_id       BigInt?
+  creator_id       Int?
+  executor_id      Int?
+  owner_id         Int?
+  product_label_id String?   @db.VarChar(99)
+  stage_id         Int?
+  step_id          Int?
+  description      String?   @db.VarChar(500)
+  deleted          Boolean   @default(false)
+}
+
+model opportunities_opportunitycomment {
+  id             Int      @id @default(autoincrement())
+  comment        String?  @db.VarChar(5000)
+  last_update    DateTime @db.DateTime(6)
+  author_id      Int?
+  opportunity_id BigInt?
+}
+
+model opportunities_opportunitystage {
+  id       Int     @id @default(autoincrement())
+  name     String  @db.VarChar(140)
+  complete Boolean
+}
+
+model opportunities_opportunitystep {
+  id        Int    @id @default(autoincrement())
+  step      Int
+  name      String @db.VarChar(140)
+  sector_id Int
+  stage_id  Int
+
+  @@index([sector_id], map: "opportunities_steps_sector_63f90adb_fk_users_companysectors_id")
+  @@index([stage_id], map: "opportunities_steps_stage_a70018fe_fk_opportunities_stages_id")
+}
+
+model opportunity_priorities {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(140)
+}
+
+model opportunity_stages {
+  id       Int     @id @default(autoincrement())
+  name     String  @db.VarChar(140)
+  complete Boolean
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model otp_static_staticdevice {
+  id                           Int       @id @default(autoincrement())
+  name                         String    @db.VarChar(64)
+  confirmed                    Boolean
+  user_id                      Int
+  throttling_failure_count     Int       @db.UnsignedInt
+  throttling_failure_timestamp DateTime? @db.DateTime(6)
+}
+
+model otp_static_statictoken {
+  id        Int    @id @default(autoincrement())
+  token     String @db.VarChar(16)
+  device_id Int
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model pipe_origens {
+  label String? @db.Text
+  id    BigInt?
+
+  @@ignore
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model pipe_stages {
+  id                        BigInt?
+  order_nr                  BigInt?
+  name                      String?  @db.Text
+  active_flag               Boolean?
+  deal_probability          BigInt?
+  pipeline_id               BigInt?
+  rotten_flag               Boolean?
+  rotten_days               Float?
+  add_time                  String?  @db.Text
+  update_time               String?  @db.Text
+  pipeline_name             String?  @db.Text
+  pipeline_deal_probability Boolean?
+
+  @@ignore
+}
+
+model reversion_revision {
+  id                Int                 @id @default(autoincrement())
+  date_created      DateTime            @db.DateTime(6)
+  comment           String              @db.LongText
+  user_id           Int?
+  users_usuario     users_usuario?      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reversion_revision_user_id_17095f45_fk_users_usuario_id")
+  reversion_version reversion_version[]
+
+  @@index([date_created], map: "reversion_revision_date_created_96f7c20c")
+  @@index([user_id], map: "reversion_revision_user_id_17095f45_fk_users_usuario_id")
+}
+
+model reversion_version {
+  id                  Int                 @id @default(autoincrement())
+  object_id           String
+  format              String              @db.VarChar(255)
+  serialized_data     String              @db.LongText
+  object_repr         String              @db.LongText
+  content_type_id     Int
+  revision_id         Int
+  db                  String
+  django_content_type django_content_type @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reversion_version_content_type_id_7d0ff25c_fk_django_co")
+  reversion_revision  reversion_revision  @relation(fields: [revision_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reversion_version_revision_id_af9f6a9d_fk_reversion_revision_id")
+
+  @@unique([db, content_type_id, object_id, revision_id], map: "reversion_version_db_content_type_id_objec_b2c54f65_uniq")
+  @@index([content_type_id], map: "reversion_version_content_type_id_7d0ff25c_fk_django_co")
+  @@index([revision_id], map: "reversion_version_revision_id_af9f6a9d_fk_reversion_revision_id")
+}
+
+model roles {
+  id              Int      @id @default(autoincrement())
+  slug            String?  @db.VarChar(45)
+  name            String?  @db.VarChar(45)
+  sector_id       Int?
+  access_level    Int?
+  is_quantitative Boolean?
+  is_active       Boolean?
+  fixed_revenue   Int?
+  min_revenue     Int?
+  goal_revenue    Int?
+  level_factorial String?  @db.VarChar(45)
+}
+
+model servicedesk_attachment {
+  id          Int       @id @default(autoincrement())
+  timestamp   DateTime? @db.DateTime(6)
+  file        String    @db.VarChar(255)
+  added_by_id Int?
+  ticket_id   Int
+}
+
+model servicedesk_comment {
+  id               Int       @id @default(autoincrement())
+  date             DateTime? @db.DateTime(6)
+  email_from       String?   @db.VarChar(320)
+  email_message_id String?   @db.VarChar(255)
+  body             String?   @db.LongText
+  author_id        Int?
+  ticket_id        Int
+  last_edit        DateTime? @db.DateTime(6)
+}
+
+model servicedesk_historicalcomment {
+  id                    Int
+  date                  DateTime?      @db.DateTime(6)
+  email_from            String?        @db.VarChar(320)
+  email_message_id      String?        @db.VarChar(255)
+  body                  String?        @db.LongText
+  history_id            Int            @id @default(autoincrement())
+  history_date          DateTime       @db.DateTime(6)
+  history_change_reason String?        @db.VarChar(100)
+  history_type          String         @db.VarChar(1)
+  author_id             Int?
+  history_user_id       Int?
+  ticket_id             Int?
+  last_edit             DateTime?      @db.DateTime(6)
+  users_usuario         users_usuario? @relation(fields: [history_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "servicedesk_historic_history_user_id_53a17deb_fk_users_usu")
+
+  @@index([history_user_id], map: "servicedesk_historic_history_user_id_53a17deb_fk_users_usu")
+  @@index([author_id], map: "servicedesk_historicalcomment_author_id_1bda7fb9")
+  @@index([id], map: "servicedesk_historicalcomment_id_c385ae88")
+  @@index([ticket_id], map: "servicedesk_historicalcomment_ticket_id_d9d0240d")
+}
+
+model servicedesk_historicalticket {
+  id                    Int
+  summary               String?        @db.VarChar(140)
+  description           String?        @db.LongText
+  created_date          DateTime       @db.DateTime(6)
+  due_date              DateTime?      @db.Date
+  completed             Boolean
+  completed_date        DateTime?      @db.DateTime(6)
+  product_class_from    String?        @db.VarChar(140)
+  product_class_to      String?        @db.VarChar(140)
+  deleted               Boolean
+  history_id            Int            @id @default(autoincrement())
+  history_date          DateTime       @db.DateTime(6)
+  history_change_reason String?        @db.VarChar(100)
+  history_type          String         @db.VarChar(1)
+  assigned_to_id        Int?
+  created_by_id         Int?
+  history_user_id       Int?
+  pf_customer_id        Int?
+  pj_customer_id        Int?
+  priority_id           Int?
+  product_label_id      String?        @db.VarChar(99)
+  status_id             Int?
+  ticket_list_id        Int?
+  amount                Float?
+  product_corporate_id  Int?
+  product_corporate     String?        @db.VarChar(140)
+  users_usuario         users_usuario? @relation(fields: [history_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "servicedesk_historic_history_user_id_616c91a3_fk_users_usu")
+
+  @@index([history_user_id], map: "servicedesk_historic_history_user_id_616c91a3_fk_users_usu")
+  @@index([assigned_to_id], map: "servicedesk_historicalticket_assigned_to_id_03dce656")
+  @@index([created_by_id], map: "servicedesk_historicalticket_created_by_id_42c8891c")
+  @@index([id], map: "servicedesk_historicalticket_id_2865ff65")
+  @@index([pf_customer_id], map: "servicedesk_historicalticket_pf_customer_id_5310003e")
+  @@index([pj_customer_id], map: "servicedesk_historicalticket_pj_customer_id_5153d62e")
+  @@index([priority_id], map: "servicedesk_historicalticket_priority_id_2872c41d")
+  @@index([product_corporate_id], map: "servicedesk_historicalticket_product_corporate_id_0b45f3f9")
+  @@index([product_label_id], map: "servicedesk_historicalticket_product_label_id_a2bb3839")
+  @@index([status_id], map: "servicedesk_historicalticket_status_id_c220d49c")
+  @@index([ticket_list_id], map: "servicedesk_historicalticket_ticket_list_id_7b5fc4a6")
+}
+
+model servicedesk_statuses {
+  id                     Int                     @id @default(autoincrement())
+  name                   String?                 @db.VarChar(40)
+  step                   Int
+  description            String?                 @db.LongText
+  active                 Boolean
+  list_id                Int?
+  sector_id              Int?
+  servicedesk_ticketlist servicedesk_ticketlist? @relation(fields: [list_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "servicedesk_statuses_servicedesk_ticketlist_id_fk")
+  users_companysectors   users_companysectors?   @relation(fields: [sector_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "servicedesk_statuses_users_companysectors_id_fk")
+
+  @@index([list_id], map: "servicedesk_statuses_list_id_ce9a022f_fk_servicede")
+  @@index([sector_id], map: "servicedesk_statuses_sector_id_index")
+}
+
+model servicedesk_ticket {
+  id                   BigInt    @id @default(autoincrement())
+  created_date         DateTime? @db.DateTime(0)
+  due_date             DateTime? @db.Date
+  completed            BigInt?
+  completed_date       DateTime? @db.DateTime(0)
+  description          String?   @db.Text
+  priority_id          BigInt?
+  assigned_to_id       BigInt?
+  created_by_id        Float?
+  ticket_list_id       BigInt?
+  summary              String?   @db.Text
+  status_id            BigInt?
+  pf_customer_id       Float?
+  pj_customer_id       Float?
+  product_label_id     String?   @db.Text
+  product_class_from   String?   @db.Text
+  product_class_to     String?   @db.Text
+  deleted              BigInt?
+  amount               Float?
+  product_corporate_id Float?
+  product_corporate    String?   @db.Text
+}
+
+model servicedesk_ticketlist {
+  id                   Int                    @id @default(autoincrement())
+  name                 String                 @db.VarChar(60)
+  slug                 String                 @db.VarChar(50)
+  sector_id            Int?
+  is_active            Boolean
+  servicedesk_statuses servicedesk_statuses[]
+  users_companysectors users_companysectors?  @relation(fields: [sector_id], references: [id], onUpdate: NoAction, map: "servicedesk_ticketlist_users_companysectors_id_fk")
+
+  @@unique([sector_id, slug], map: "servicedesk_ticketlist_sector_slug_c9c54972_uniq")
+}
+
+model servicedesk_ticketpriority {
+  id          Int     @id @unique(map: "servicedesk_ticketpriority_id_uindex")
+  name        String  @db.VarChar(25)
+  description String? @db.LongText
+}
+
+model sitetree_tree {
+  id                Int                 @id @default(autoincrement())
+  title             String              @db.VarChar(100)
+  alias             String              @unique(map: "alias") @db.VarChar(80)
+  sitetree_treeitem sitetree_treeitem[]
+}
+
+model sitetree_treeitem {
+  id                                   Int                                    @id @default(autoincrement())
+  title                                String                                 @db.VarChar(100)
+  hint                                 String                                 @db.VarChar(200)
+  url                                  String                                 @db.VarChar(200)
+  urlaspattern                         Boolean
+  hidden                               Boolean
+  alias                                String?                                @db.VarChar(80)
+  description                          String                                 @db.LongText
+  inmenu                               Boolean
+  inbreadcrumbs                        Boolean
+  insitetree                           Boolean
+  access_loggedin                      Boolean
+  access_guest                         Boolean
+  access_restricted                    Boolean
+  access_perm_type                     Int
+  sort_order                           Int
+  parent_id                            Int?
+  tree_id                              Int
+  sitetree_treeitem                    sitetree_treeitem?                     @relation("sitetree_treeitemTositetree_treeitem", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sitetree_treeitem_parent_id_88f6f9a4_fk_sitetree_treeitem_id")
+  other_sitetree_treeitem              sitetree_treeitem[]                    @relation("sitetree_treeitemTositetree_treeitem")
+  sitetree_tree                        sitetree_tree                          @relation(fields: [tree_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sitetree_treeitem_tree_id_038a4bc7_fk_sitetree_tree_id")
+  sitetree_treeitem_access_permissions sitetree_treeitem_access_permissions[]
+
+  @@unique([tree_id, alias], map: "sitetree_treeitem_tree_id_alias_f597fbd9_uniq")
+  @@index([access_guest], map: "sitetree_treeitem_access_guest_09916132")
+  @@index([access_loggedin], map: "sitetree_treeitem_access_loggedin_8a523197")
+  @@index([access_restricted], map: "sitetree_treeitem_access_restricted_e9c87676")
+  @@index([alias], map: "sitetree_treeitem_alias_33dc5690")
+  @@index([hidden], map: "sitetree_treeitem_hidden_5de28c6e")
+  @@index([inbreadcrumbs], map: "sitetree_treeitem_inbreadcrumbs_ebb24448")
+  @@index([inmenu], map: "sitetree_treeitem_inmenu_ccabc0b0")
+  @@index([insitetree], map: "sitetree_treeitem_insitetree_60c593a5")
+  @@index([parent_id], map: "sitetree_treeitem_parent_id_88f6f9a4_fk_sitetree_treeitem_id")
+  @@index([sort_order], map: "sitetree_treeitem_sort_order_93fd716c")
+  @@index([url], map: "sitetree_treeitem_url_b91ef35a")
+  @@index([urlaspattern], map: "sitetree_treeitem_urlaspattern_ff432a51")
+}
+
+model sitetree_treeitem_access_permissions {
+  id                Int               @id @default(autoincrement())
+  treeitem_id       Int
+  permission_id     Int
+  auth_permission   auth_permission   @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sitetree_treeitem_ac_permission_id_c6d1d87a_fk_auth_perm")
+  sitetree_treeitem sitetree_treeitem @relation(fields: [treeitem_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sitetree_treeitem_ac_treeitem_id_aedb7367_fk_sitetree_")
+
+  @@unique([treeitem_id, permission_id], map: "sitetree_treeitem_access_treeitem_id_permission_i_a3224a96_uniq")
+  @@index([permission_id], map: "sitetree_treeitem_ac_permission_id_c6d1d87a_fk_auth_perm")
+}
+
+model taggit_tag {
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique(map: "name") @db.VarChar(100)
+  slug              String              @unique(map: "slug") @db.VarChar(100)
+  taggit_taggeditem taggit_taggeditem[]
+}
+
+model taggit_taggeditem {
+  id                  Int                 @id @default(autoincrement())
+  object_id           Int
+  content_type_id     Int
+  tag_id              Int
+  django_content_type django_content_type @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "taggit_taggeditem_content_type_id_9957a03c_fk_django_co")
+  taggit_tag          taggit_tag          @relation(fields: [tag_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "taggit_taggeditem_tag_id_f4f5b767_fk_taggit_tag_id")
+
+  @@unique([content_type_id, object_id, tag_id], map: "taggit_taggeditem_content_type_id_object_id_tag_id_4bb97a8e_uniq")
+  @@index([content_type_id, object_id], map: "taggit_taggeditem_content_type_id_object_id_196cc965_idx")
+  @@index([object_id], map: "taggit_taggeditem_object_id_e2d7d1df")
+  @@index([tag_id], map: "taggit_taggeditem_tag_id_f4f5b767_fk_taggit_tag_id")
+}
+
+model team_id_factorial {
+  id                                                                                                       Int                                 @id
+  nome_time                                                                                                String                              @db.VarChar(20)
+  users_usuario_factorial_teams_ids_users_usuario_factorial_teams_ids_team_id_factorialToteam_id_factorial users_usuario_factorial_teams_ids[] @relation("users_usuario_factorial_teams_ids_team_id_factorialToteam_id_factorial")
+}
+
+model teams_factorial {
+  id   Int    @id
+  name String @db.VarChar(45)
+}
+
+model token_blacklist_blacklistedtoken {
+  id                               Int                              @id @default(autoincrement())
+  blacklisted_at                   DateTime                         @db.DateTime(6)
+  token_id                         Int                              @unique(map: "token_id")
+  token_blacklist_outstandingtoken token_blacklist_outstandingtoken @relation(fields: [token_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "token_blacklist_blac_token_id_3cc7fe56_fk_token_bla")
+}
+
+model token_blacklist_outstandingtoken {
+  id                               Int                               @id @default(autoincrement())
+  token                            String                            @db.LongText
+  created_at                       DateTime?                         @db.DateTime(6)
+  expires_at                       DateTime                          @db.DateTime(6)
+  user_id                          Int?
+  jti                              String                            @unique(map: "token_blacklist_outstandingtoken_jti_hex_d9bdf6f7_uniq") @db.VarChar(255)
+  token_blacklist_blacklistedtoken token_blacklist_blacklistedtoken?
+  users_usuario                    users_usuario?                    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "token_blacklist_outs_user_id_83bc629a_fk_users_usu")
+
+  @@index([user_id], map: "token_blacklist_outs_user_id_83bc629a_fk_users_usu")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model user_farmer {
+  id            Int
+  pipe_name     String?       @db.VarChar(30)
+  @@index([id], map: "id")
+  @@ignore
+}
+
+model user_sessions_session {
+  session_key   String   @id @db.VarChar(40)
+  session_data  String   @db.LongText
+  expire_date   DateTime @db.DateTime(6)
+  user_agent    String?  @db.VarChar(200)
+  last_activity DateTime @db.DateTime(6)
+  ip            String?  @db.Char(39)
+  user_id       Int?
+}
+
+model users_afastamento {
+  id            Int            @id @default(autoincrement())
+  start         DateTime       @db.Date
+  end           DateTime       @db.Date
+  reason        String?        @db.VarChar(99)
+  comment       String?        @db.LongText
+  user_id       Int?
+  users_usuario users_usuario? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_afastamento_user_id_0279bc00_fk_users_usuario_id")
+
+  @@index([user_id], map: "users_afastamento_user_id_0279bc00_fk_users_usuario_id")
+}
+
+model users_assessorlideranca {
+  id            Int             @id @default(autoincrement())
+  level         String          @db.VarChar(99)
+  order         Int?            @unique(map: "users_assessorlideranca_order_676bb686_uniq")
+  var_captacao  Float?
+  var_p1        Float?
+  var_p2        Float?
+  name          String?         @db.VarChar(99)
+  calls         Int?            @default(0)
+  meetings      Int?            @default(0)
+  icon_file     String?         @db.VarChar(255)
+  users_usuario users_usuario[]
+}
+
+model users_companysectors {
+  id                     Int                      @id @default(autoincrement())
+  name                   String                   @db.VarChar(99)
+  slug                   String                   @db.VarChar(99)
+  display_name           String                   @db.VarChar(99)
+  servicedesk_active     Boolean
+  role_authority         String?                  @db.VarChar(999)
+  is_active              Boolean?
+  role_factorial         String?                  @db.VarChar(255)
+  servicedesk_statuses   servicedesk_statuses[]
+  servicedesk_ticketlist servicedesk_ticketlist[]
+}
+
+model users_historical_variaveis_metas {
+  id                    String         @db.VarChar(7)
+  ano                   Int
+  mes                   Int
+  history_id            Int            @id @default(autoincrement())
+  history_date          DateTime       @db.DateTime(6)
+  history_change_reason String?        @db.VarChar(100)
+  history_type          String         @db.VarChar(1)
+  history_user_id       Int?
+  p1                    Float?
+  p2                    Float?
+  p1_min                Float?
+  p2_min                Float?
+  lig_c                 Float?
+  lig_r                 Float?
+  r1                    Float?
+  r2                    Float?
+  r3                    Float?
+  min_net_ajustado      Float?
+  p1_variaveis          String?        @db.VarChar(255)
+  p2_variaveis          String?        @db.VarChar(255)
+  users_usuario         users_usuario? @relation(fields: [history_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_historical_var_history_user_id_eaba55a3_fk_users_usu")
+
+  @@index([history_user_id], map: "users_historical_var_history_user_id_eaba55a3_fk_users_usu")
+  @@index([id], map: "users_historical_variaveis_metas_id_6a17480c")
+}
+
+model users_historicalassessor_infos_mensais {
+  id                    String         @db.VarChar(99)
+  date                  String         @db.VarChar(99)
+  assessor              String         @db.LongText
+  net                   Float?
+  net_ajustado          Float?
+  meta_custodia         Float?
+  p1                    Float?
+  p2                    Float?
+  lig_c                 Float?
+  lig_r                 Float?
+  r1                    Float?
+  r2                    Float?
+  r3                    Float?
+  history_id            Int            @id @default(autoincrement())
+  history_date          DateTime       @db.DateTime(6)
+  history_change_reason String?        @db.VarChar(100)
+  history_type          String         @db.VarChar(1)
+  history_user_id       Int?
+  r2x1                  Int?
+  level                 String?        @db.VarChar(99)
+  calls                 Int            @default(0)
+  meetings              Int            @default(0)
+  advisor_id            Int?
+  users_usuario         users_usuario? @relation(fields: [history_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hub_historicaln3_met_history_user_id_d8cb944e_fk_users_usu")
+
+  @@index([history_user_id], map: "hub_historicaln3_met_history_user_id_d8cb944e_fk_users_usu")
+  @@index([id], map: "hub_historicaln3_metas_id_5d335787")
+  @@index([advisor_id], map: "users_historicalassessor_infos_mensais_advisor_id_08e65314")
+}
+
+model users_historicalassessor_resultados_mensais {
+  id                    String         @db.VarChar(99)
+  date                  DateTime       @db.Date
+  assessor              String         @db.LongText
+  lig_c                 Float?
+  lig_r                 Float?
+  r1                    Float?
+  r2x1                  Float?
+  r2                    Float?
+  r3                    Float?
+  history_id            Int            @id @default(autoincrement())
+  history_date          DateTime       @db.DateTime(6)
+  history_change_reason String?        @db.VarChar(100)
+  history_type          String         @db.VarChar(1)
+  history_user_id       Int?
+  captacao              Float?
+  coe                   Float?
+  renda_fixa            Float?
+  previdencia           Float?
+  esp_fii               Float?
+  ipo_fii               Float?
+  fully_funded          Float?
+  p1                    Float?
+  p2                    Float?
+  private_equity        Float?
+  cart_rec_acoes        Float?
+  carteira_fii          Float?
+  excedente_coe         Float?
+  seguros               Float?         @default(0.00)
+  comment               String?        @db.Text
+  reuniao_nivel2_2x1    Boolean        @default(false)
+  users_usuario         users_usuario? @relation(fields: [history_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hub_historicaln3_pac_history_user_id_78cfc3e6_fk_users_usu")
+
+  @@index([history_user_id], map: "hub_historicaln3_pac_history_user_id_78cfc3e6_fk_users_usu")
+  @@index([id], map: "hub_historicaln3_pace_auto_id_33a94570")
+}
+
+model users_historicalassessorlevel {
+  id                     Int
+  level                  String         @db.VarChar(99)
+  history_id             Int            @id @default(autoincrement())
+  history_date           DateTime       @db.DateTime(6)
+  history_change_reason  String?        @db.VarChar(100)
+  history_type           String         @db.VarChar(1)
+  history_user_id        Int?
+  min_value              Float?
+  order                  Int?
+  p1_min                 Float?         @default(0.00000)
+  p1_var                 Float?         @default(0.00000)
+  p2_min                 Float?         @default(0.00000)
+  p2_var                 Float?         @default(0.00000)
+  goal_capt              Float          @default(0)
+  goal_lig_c_day         Float          @default(0)
+  goal_lig_r_day         Float          @default(0)
+  goal_r1_day            Float          @default(0)
+  goal_r2_day            Float          @default(0)
+  goal_r2x1_lider_weekly Float          @default(0)
+  bonus_mensal           Float?         @default(0.00000)
+  name                   String?        @db.VarChar(99)
+  segmentation           Int?
+  icon_file              String?        @db.VarChar(255)
+  sector                 String         @db.VarChar(255)
+  users_usuario          users_usuario? @relation(fields: [history_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_historicalasse_history_user_id_16ef14dd_fk_users_usu")
+
+  @@index([history_user_id], map: "users_historicalasse_history_user_id_16ef14dd_fk_users_usu")
+  @@index([id], map: "users_historicalassessorlevel_id_02cd7e64")
+  @@index([order], map: "users_historicalassessorlevel_order_ed62168c")
+}
+
+model users_historicalassessorlideranca {
+  id                    Int
+  level                 String         @db.VarChar(99)
+  order                 Int?
+  var_captacao          Float?
+  var_p1                Float?
+  var_p2                Float?
+  history_id            Int            @id @default(autoincrement())
+  history_date          DateTime       @db.DateTime(6)
+  history_change_reason String?        @db.VarChar(100)
+  history_type          String         @db.VarChar(1)
+  history_user_id       Int?
+  name                  String?        @db.VarChar(99)
+  calls                 Int?           @default(0)
+  meetings              Int?           @default(0)
+  icon_file             String?        @db.VarChar(255)
+  users_usuario         users_usuario? @relation(fields: [history_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_historicalasse_history_user_id_12ff29a8_fk_users_usu")
+
+  @@index([history_user_id], map: "users_historicalasse_history_user_id_12ff29a8_fk_users_usu")
+  @@index([id], map: "users_historicalassessorlideranca_id_135ec0db")
+  @@index([order], map: "users_historicalassessorlideranca_order_4cee8612")
+}
+
+model users_historicalcompanysectors {
+  id                    Int
+  name                  String?  @db.VarChar(99)
+  slug                  String?  @db.VarChar(99)
+  display_name          String?  @db.VarChar(99)
+  history_id            Int      @id @default(autoincrement())
+  history_date          DateTime @db.DateTime(6)
+  history_change_reason String?  @db.VarChar(100)
+  history_type          String   @db.VarChar(1)
+  history_user_id       Int?
+  servicedesk_active    Boolean
+  role_authority        String?  @db.VarChar(999)
+  is_active             Boolean? @default(true)
+
+  @@index([history_user_id], map: "users_historicalcomp_history_user_id_4e8ac76b_fk_users_usu")
+  @@index([id], map: "users_historicalcompanysectors_id_87fd97cc")
+}
+
+model users_historicalspecialists {
+  id                    String         @db.VarChar(99)
+  name                  String         @db.VarChar(99)
+  members               String?        @db.VarChar(9999)
+  history_id            Int            @id @default(autoincrement())
+  history_date          DateTime       @db.DateTime(6)
+  history_change_reason String?        @db.VarChar(100)
+  history_type          String         @db.VarChar(1)
+  history_user_id       Int?
+  users_usuario         users_usuario? @relation(fields: [history_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_historicalspec_history_user_id_a74478b8_fk_users_usu")
+
+  @@index([history_user_id], map: "users_historicalspec_history_user_id_a74478b8_fk_users_usu")
+  @@index([id], map: "users_historicalspecialists_id_1f30f767")
+  @@index([name], map: "users_historicalspecialists_name_82e5fe13")
+}
+
+model users_historicaltime {
+  id                    String         @db.VarChar(99)
+  nome                  String         @db.VarChar(100)
+  lider                 String?        @db.VarChar(100)
+  history_id            Int            @id @default(autoincrement())
+  history_date          DateTime       @db.DateTime(6)
+  history_change_reason String?        @db.VarChar(100)
+  history_type          String         @db.VarChar(1)
+  history_user_id       Int?
+  membros               String?        @db.VarChar(9999)
+  time_abaixo           String?        @db.VarChar(999)
+  time_ativo            Boolean?
+  nivel_time            Int?
+  category              String?        @default("assessores") @db.VarChar(99)
+  authority             String?        @db.VarChar(999)
+  name                  String?        @db.VarChar(100)
+  users_usuario         users_usuario? @relation(fields: [history_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_historicaltime_history_user_id_86fe5065_fk_users_usu")
+
+  @@index([history_user_id], map: "users_historicaltime_history_user_id_86fe5065_fk_users_usu")
+  @@index([id], map: "users_historicaltime_id_ae6f5c9a")
+  @@index([nome], map: "users_historicaltime_nome_59b24181")
+}
+
+model users_historicalusuario {
+  password              String?   @db.Text
+  last_login            DateTime? @db.DateTime(0)
+  username              String?   @db.Text
+  email                 String?   @db.Text
+  pipe_name             String?   @db.Text
+  is_active             Int?
+  is_admin              Int?
+  history_date          DateTime? @db.DateTime(0)
+  history_change_reason String?   @db.Text
+  history_type          String?   @db.Text
+  history_user_id       Int?
+  ass_code              Int?
+  ass_ativo             Int?
+  is_lider              Int?
+  is_superuser          Int?
+  ass_photo             String?   @db.Text
+  nivel                 Int?
+  nivel_lid             Int?
+  abaixo_de             String?   @db.Text
+  nome                  String?   @db.Text
+  is_specialist         Int?
+  mesa_nivel_2          Int?
+  contract_status       String?   @db.Text
+  is_staff              Int?
+  team                  String?   @db.Text
+  first_name            String?   @db.Text
+  full_name             String?   @db.Text
+  last_name             String?   @db.Text
+  name_display          String?   @db.Text
+  sector                String?   @db.Text
+  start_assessoria      String?   @db.Text
+  level_id              Int?
+  level_lid_id          Int?
+  sector_key_id         Int?
+  is_partner            Int?
+  role_id               Int?
+  id                    Int?
+  team_id               String?   @db.Text
+  big_team_id           String?   @db.Text
+  id_factorial          Int?
+  history_id            BigInt    @id @default(autoincrement())
+}
+
+model users_specialists {
+  id      String  @id @db.VarChar(99)
+  name    String  @unique(map: "name") @db.VarChar(99)
+  members String? @db.VarChar(9999)
+}
+
+model users_time {
+  id           String   @id @db.VarChar(99)
+  nome         String   @unique(map: "users_time_nome_c33695f2_uniq") @db.VarChar(100)
+  lider        String?  @db.VarChar(100)
+  membros      String?  @db.VarChar(9999)
+  time_abaixo  String?  @db.VarChar(999)
+  time_ativo   Boolean? @default(true)
+  nivel_time   Int?
+  category     String?  @default("assessores") @db.VarChar(99)
+  slug         String?  @db.VarChar(45)
+  authority    String?  @db.VarChar(999)
+  name         String?  @db.VarChar(100)
+  id_factorial Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model users_timenew {
+  id        BigInt?
+  slug      String? @db.Text
+  name      String? @db.Text
+  authority String? @db.Text
+  is_active BigInt?
+  category  String? @db.Text
+  leader_id BigInt?
+
+  @@ignore
+}
+
+model users_usuario {
+  password                                     String?                                        @db.VarChar(128)
+  last_login                                   DateTime?                                      @db.DateTime(6)
+  id                                           Int                                            @id @default(autoincrement())
+  username                                     String                                         @unique(map: "username") @db.VarChar(20)
+  email                                        String                                         @unique(map: "users_usuario_email_b77ec988_uniq") @db.VarChar(255)
+  pipe_name                                    String?                                        @db.VarChar(255)
+  is_active                                    Boolean
+  is_admin                                     Boolean
+  ass_code                                     BigInt?
+  ass_ativo                                    Boolean
+  is_lider                                     Boolean
+  is_superuser                                 Boolean
+  ass_photo                                    String?                                        @default("default/no-user-image-icon-23.jpg") @db.VarChar(255)
+  nivel                                        Int?
+  nivel_lid                                    Int?
+  abaixo_de                                    String?                                        @db.VarChar(255)
+  nome                                         String?                                        @db.VarChar(99)
+  is_specialist                                Boolean
+  mesa_nivel_2                                 Boolean?                                       @default(false)
+  contract_status                              String                                         @default("Assessor no Contrato Social") @db.VarChar(255)
+  is_staff                                     Boolean
+  team                                         String?                                        @db.VarChar(99)
+  first_name                                   String?                                        @db.VarChar(99)
+  full_name                                    String?                                        @db.VarChar(99)
+  last_name                                    String?                                        @db.VarChar(99)
+  name_display                                 String?                                        @db.VarChar(99)
+  sector                                       String?                                        @db.VarChar(255)
+  start_assessoria                             String?                                        @db.VarChar(10)
+  level_id                                     Int?
+  level_lid_id                                 Int?
+  sector_key_id                                Int?
+  is_partner                                   Boolean
+  role_id                                      Int?
+  team_id                                      String?                                        @db.VarChar(45)
+  big_team_id                                  String?                                        @db.VarChar(45)
+  id_factorial                                 Int?
+  account_emailaddress                         account_emailaddress[]
+  announcements_announcement                   announcements_announcement[]
+  announcements_dismissal                      announcements_dismissal[]
+  attachments_attachment                       attachments_attachment[]
+  authtoken_token                              authtoken_token?
+  django_admin_log                             django_admin_log[]
+  django_rest_passwordreset_resetpasswordtoken django_rest_passwordreset_resetpasswordtoken[]
+  guardian_userobjectpermission                guardian_userobjectpermission[]
+  messaging_message                            messaging_message[]
+  messaging_userthread                         messaging_userthread[]
+  notifications_notification                   notifications_notification[]
+  opportunities_historicalopportunitypriority  opportunities_historicalopportunitypriority[]
+  reversion_revision                           reversion_revision[]
+  servicedesk_historicalcomment                servicedesk_historicalcomment[]
+  servicedesk_historicalticket                 servicedesk_historicalticket[]
+  token_blacklist_outstandingtoken             token_blacklist_outstandingtoken[]
+  users_afastamento                            users_afastamento[]
+  users_historical_variaveis_metas             users_historical_variaveis_metas[]
+  users_historicalassessor_infos_mensais       users_historicalassessor_infos_mensais[]
+  users_historicalassessor_resultados_mensais  users_historicalassessor_resultados_mensais[]
+  users_historicalassessorlevel                users_historicalassessorlevel[]
+  users_historicalassessorlideranca            users_historicalassessorlideranca[]
+  users_historicalspecialists                  users_historicalspecialists[]
+  users_historicaltime                         users_historicaltime[]
+  assessor_level                               assessor_level?                                @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_usuario_level_id_8b68ebfa_fk_assessor_level_id")
+  users_assessorlideranca                      users_assessorlideranca?                       @relation(fields: [level_lid_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_usuario_level_lid_id_b5ff1c29_fk_users_ass")
+  users_usuario_factorial                      users_usuario_factorial[]
+  users_usuario_groups                         users_usuario_groups[]
+  users_usuario_user_permissions               users_usuario_user_permissions[]
+
+  @@index([level_id], map: "users_usuario_level_id_8b68ebfa_fk_assessor_level_id")
+  @@index([level_lid_id], map: "users_usuario_level_lid_id_b5ff1c29_fk_users_ass")
+}
+
+model users_usuario_factorial {
+  id                                Int                                 @id @unique(map: "id") @default(autoincrement())
+  idFactorial                       Int
+  idAvel                            Int?
+  first_name                        String                              @db.VarChar(30)
+  last_name                         String                              @db.VarChar(40)
+  full_name                         String                              @db.VarChar(70)
+  email                             String                              @db.VarChar(50)
+  phone_number                      String                              @db.VarChar(15)
+  terminated_on                     DateTime?                           @db.DateTime(0)
+  identifier                        String                              @db.VarChar(20)
+  identifier_type                   String                              @db.VarChar(20)
+  gender                            String                              @db.VarChar(20)
+  bank_number                       String                              @db.VarChar(20)
+  manager_id                        Int?
+  company_identifier                Int?
+  users_usuario                     users_usuario?                      @relation(fields: [idAvel], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_usuario_factorial_ibfk_1")
+  users_usuario_factorial_teams_ids users_usuario_factorial_teams_ids[]
+
+  @@index([idAvel], map: "idAvel")
+}
+
+model users_usuario_factorial_teams_ids {
+  user_id                                                                                  Int
+  team_id_factorial                                                                        Int
+  users_usuario_factorial                                                                  users_usuario_factorial @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_usuario_factorial_teams_ids_ibfk_1")
+  team_id_factorial_users_usuario_factorial_teams_ids_team_id_factorialToteam_id_factorial team_id_factorial       @relation("users_usuario_factorial_teams_ids_team_id_factorialToteam_id_factorial", fields: [team_id_factorial], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_usuario_factorial_teams_ids_ibfk_2")
+
+  @@id([user_id, team_id_factorial])
+  @@index([team_id_factorial], map: "team_id_factorial")
+}
+
+model users_usuario_groups {
+  id            Int           @id @default(autoincrement())
+  usuario_id    Int
+  group_id      Int
+  auth_group    auth_group    @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_usuario_groups_group_id_9d969afd_fk_auth_group_id")
+  users_usuario users_usuario @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_usuario_groups_usuario_id_3a8a9a06_fk_users_usuario_id")
+
+  @@unique([usuario_id, group_id], map: "users_usuario_groups_usuario_id_group_id_db69fe93_uniq")
+  @@index([group_id], map: "users_usuario_groups_group_id_9d969afd_fk_auth_group_id")
+}
+
+model users_usuario_user_permissions {
+  id              Int             @id @default(autoincrement())
+  usuario_id      Int
+  permission_id   Int
+  auth_permission auth_permission @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_usuario_user_p_permission_id_bf5f5453_fk_auth_perm")
+  users_usuario   users_usuario   @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_usuario_user_p_usuario_id_75526fda_fk_users_usu")
+
+  @@unique([usuario_id, permission_id], map: "users_usuario_user_permi_usuario_id_permission_id_9b373975_uniq")
+  @@index([permission_id], map: "users_usuario_user_p_permission_id_bf5f5453_fk_auth_perm")
+}
+
+model conversas_bot_trilha {
+  id                   Int                    @id @default(autoincrement())
+  customer_id          BigInt?
+  started_at           DateTime?              @db.DateTime(0)
+  finished_at          DateTime?              @db.DateTime(0)
+  session_open         Boolean?
+  customer             customer?              @relation(fields: [customer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "conversas_bot_trilha_ibfk_1")
+  mensagens_bot_trilha mensagens_bot_trilha[]
+
+  @@index([customer_id], map: "customer_id")
+}
+
+model mensagens_bot_trilha {
+  id                   Int                   @id @default(autoincrement())
+  conversa_id          Int?
+  sender_id            Int?
+  recipient_id         Int?
+  sent_at              DateTime?             @db.DateTime(0)
+  intentions           String?               @db.VarChar(45)
+  conversas_bot_trilha conversas_bot_trilha? @relation(fields: [conversa_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mensagens_bot_trilha_ibfk_1")
+
+  @@index([conversa_id], map: "conversa_id")
 }

@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import { MessageDialogFlow } from "../../types";
 import { v4 } from "uuid";
-import { SessionService } from "./sessionService";
+// import { SessionService } from "./sessionService";
 import { TwilioService } from "./twilioService";
 import { IAIQuestionAnswering } from "../interfaces/IAIQuestionAnswering ";
 import fs from "fs";
@@ -29,7 +29,7 @@ export class DialogflowService implements IAIQuestionAnswering {
   databaseService: any;
   twilioService: any;
   constructor() {
-    this.databaseService = new SessionService();
+    // this.databaseService = new SessionService();
     this.twilioService = new TwilioService();
   }
 

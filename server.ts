@@ -16,7 +16,7 @@ app.use("/customer", customerCallsRoute);
 
 const port = process.env.PORT;
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   res.sendStatus(200);
 });
 
