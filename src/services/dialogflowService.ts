@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { MessageDialogFlow } from "../../types";
+import { MessageDialogFlow, ResponseObject } from "../../types";
 import { v4 } from "uuid";
 import { SessionService } from "./sessionService";
 import { TwilioService } from "./twilioService";
@@ -55,8 +55,10 @@ export class DialogflowService implements IAIQuestionAnswering {
       sessionId = sessionInProgress.id;
     } else {
       console.log("else");
-      sessionId = v4();
-      await this.databaseService.createSession(telefoneCliente);
+      const newSession = await this.databaseService.createSession(
+        telefoneCliente
+      );
+      sessionId = newSession.id;
     }
 
     const client = new SessionsClient({
@@ -64,7 +66,6 @@ export class DialogflowService implements IAIQuestionAnswering {
       apiEndpoint: process.env.APIENDPOINT,
     });
 
-    //const sessionId = v4();
     const sessionPath = client.projectLocationAgentSessionPath(
       projectId,
       location,
@@ -92,6 +93,7 @@ export class DialogflowService implements IAIQuestionAnswering {
       },
     };
     const [response] = await client.detectIntent(request);
+
     console.log(`User Query: ${response.queryResult.transcript}`);
 
     console.log(response, "Response");
@@ -185,6 +187,6 @@ export class DialogflowService implements IAIQuestionAnswering {
     console.log(
       `Current Page: ${response.queryResult.currentPage.displayName}`
     );
-    return response.queryResult.responseMessages as MessageDialogFlow[];
+    return response as ResponseObject;
   }
 }

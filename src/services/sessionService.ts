@@ -58,4 +58,6 @@ export class SessionService implements ISessionDatabase {
     });
     return session;
   }
+
+  // async saveMessage(): Promise<> {}
 }

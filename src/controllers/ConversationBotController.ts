@@ -1,5 +1,5 @@
 import * as express from "express";
-import { Message } from "../../types";
+import { Message, MessageDialogFlow } from "../../types";
 import { IAIQuestionAnswering } from "../interfaces/IAIQuestionAnswering ";
 import { IConversationBot } from "../interfaces/IConversationBot";
 import { IDownloadMedia } from "../interfaces/IDownloadMedia";
@@ -29,11 +29,12 @@ export class ConversationBotController implements IConversationBot {
         MediaContentType0
       );
 
-      const response = await this.interpretMessage.detectIntentAudio(
-        From,
-        audio,
-        MediaContentType0
-      );
+      const response: MessageDialogFlow[] =
+        await this.interpretMessage.detectIntentAudio(
+          From,
+          audio,
+          MediaContentType0
+        );
 
       if (!response) {
         res.sendStatus(200);
