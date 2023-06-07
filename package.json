@@ -4,11 +4,13 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node server.ts"
+    "dev": "nodemon server.ts"
   },
   "devDependencies": {
     "@types/uuid": "^9.0.1",
     "ngrok": "^5.0.0-beta.2",
+    "nodemon": "^2.0.22",
+    "sucrase": "^3.32.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   },

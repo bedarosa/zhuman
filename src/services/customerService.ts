@@ -1,8 +1,9 @@
 import { PrismaClient } from "@prisma/client";
+import { ICustomerDatabase } from "../interfaces/ICustomerDatabase";
 
 const prisma = new PrismaClient();
 
-export class CustomerService {
+export class CustomerService implements ICustomerDatabase {
   constructor() {}
 
   async getCustomerById(id: number) {
@@ -18,7 +19,9 @@ export class CustomerService {
   async getCustomerByPhone(phone: string) {
     const customer = await prisma.customer.findFirst({
       where: {
-        phone: phone,
+        phone: {
+          contains: phone,
+        },
       },
     });
     return customer;

@@ -23,50 +23,54 @@ export class ConversationBotController implements IConversationBot {
     res: express.Response
   ): Promise<void> {
     const { Body, From, To, MediaUrl0, MediaContentType0 } = req.body;
-    const telefoneCliente = From.replace(/\D/g, "");
+    // const telefoneFormatado = From.replace(/\D/g, "");
+    const telefoneFormatado = "985747852";
+
     let conversation;
     let session;
     let customer;
-    /* console.log(Body);
-    console.log(From);
-    console.log(MediaUrl0);
-    console.log(MediaContentType0); */
+
     // Checar se tem uma sessão, se tem e estiver fechada ignora
     // se tiver e estiver aberta enviar a sessão ao DG
 
+    // Id da conversa tem que ser uma guid
     const conversationId =
-      await this.conversationDatabase.getConversationByPhone(telefoneCliente);
+      await this.conversationDatabase.getConversationByPhone(telefoneFormatado);
     // Se ele tem uma sessão e esta fechada não leva pra frente.
     if (conversationId && conversationId.session_open == false) {
       res.sendStatus(200);
       return;
     }
-
     // Se não tem, nem nunca teve, abre uma sessão (Conversa).
     if (!conversationId) {
-      customer = this.customerDatabase.getCustomerByPhone(telefoneCliente);
+      customer = await this.customerDatabase.getCustomerByPhone(
+        telefoneFormatado
+      );
       conversation = await this.conversationDatabase.createConversation(
         customer.id
       );
       session = conversation.id; //mudar o conversationID para GUID
+    } else {
+      session = conversationId.id;
     }
-
+    console.log(session);
+    console.log(session);
     // Alterar a conversationID que envia pro DG pelo id da conversa do banco
 
     if (MediaUrl0 || MediaContentType0) {
       const audio = await this.downloadMedia.downloadAudio(
         MediaUrl0,
-        telefoneCliente,
+        telefoneFormatado,
         MediaContentType0
       );
 
       const response = await this.interpretMessage.detectIntentAudio(
-        telefoneCliente,
+        telefoneFormatado,
         audio,
         MediaContentType0,
         session
       );
-
+      // Transformar em metodo.
       for (const message of response) {
         try {
           if (message.text) {
@@ -96,7 +100,7 @@ export class ConversationBotController implements IConversationBot {
     }
 
     const response = await this.interpretMessage.detectIntentText(
-      telefoneCliente,
+      telefoneFormatado,
       Body,
       session
     );

@@ -5,6 +5,21 @@ const prisma = new PrismaClient();
 
 export class ConversationService implements IConversationDatabase {
   constructor() {}
+  getConversationByCustomerId(customer_id: number) {
+    throw new Error("Method not implemented.");
+  }
+  async getConversationByPhone(phone: string) {
+    const conversa = await prisma.conversas_bot_trilha.findFirst({
+      where: {
+        customer: {
+          phone: {
+            contains: phone,
+          },
+        },
+      },
+    });
+    return conversa;
+  }
   // Objeto que vai receber tem que ser tipo:
   async createConversation(customer_id: number) {
     const conversa = await prisma.conversas_bot_trilha.create({

@@ -6,7 +6,7 @@ import { IDownloadMedia } from "../interfaces/IDownloadMedia";
 
 dotenv.config();
 
-export class DownloadMedia implements IDownloadMedia {
+export class DownloadMediaService implements IDownloadMedia {
   async downloadAudio(
     url: string,
     telefoneCliente: string,
