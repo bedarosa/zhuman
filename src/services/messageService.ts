@@ -1,8 +1,10 @@
 import { PrismaClient } from "@prisma/client";
+import { IMessageDatabase } from "../interfaces/IMessageDatabase";
+import { IMessages } from "../interfaces/IMessages";
 
 const prisma = new PrismaClient();
 
-export class MessageService {
+export class MessageService implements IMessageDatabase {
   constructor() {}
   // Objeto que vai receber tem que ser tipo:
   async createMessage(

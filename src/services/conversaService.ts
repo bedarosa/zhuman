@@ -1,14 +1,15 @@
 import { PrismaClient } from "@prisma/client";
+import { IConversationDatabase } from "../interfaces/IConversationDatabase";
 
 const prisma = new PrismaClient();
 
-export class MessageService {
+export class ConversationService implements IConversationDatabase {
   constructor() {}
   // Objeto que vai receber tem que ser tipo:
-  async createConversation() {
+  async createConversation(customer_id: number) {
     const conversa = await prisma.conversas_bot_trilha.create({
       data: {
-        customer_id: 123, // id do customer
+        customer_id: customer_id, // id do customer
         started_at: new Date(), // primeira mensagem
         finished_at: new Date(), // quando chegou ao fim da conversa
         session_open: true,
@@ -17,10 +18,10 @@ export class MessageService {
     return conversa;
   }
 
-  async finishConversation(conversationId: number) {
+  async finishConversation(conversation_id: number) {
     const conversa = await prisma.conversas_bot_trilha.update({
       where: {
-        id: conversationId,
+        id: conversation_id,
       },
       data: {
         session_open: false,

@@ -16,8 +16,8 @@ export class TwilioService implements IMessages {
   async sendWhatsApp(message: Message): Promise<any> {
     await this.client.messages.create({
       body: `${message.body}`,
-      from: "whatsapp:+14155238886",
-      to: "whatsapp:+555185747852",
+      from: message.from,
+      to: message.to,
     });
   }
 }

@@ -36,20 +36,21 @@ export class DialogflowService implements IAIQuestionAnswering {
   async detectIntentAudio(
     telefoneCliente: string,
     pathAudio: string,
-    MediaContentType: string
+    MediaContentType: string,
+    session: string
   ): Promise<any> {
     //const filename = pathAudio;
     //const extensaoMedia = MediaContentType.split("/")[1];
 
-    const sessionInProgress = await this.databaseService.getSessionOpened(
+    /* const sessionInProgress = await this.databaseService.getSessionOpened(
       telefoneCliente
-    );
+    ); */
 
     // verifica se o numero já tem uma sessionID em aberto
     // se tiver envia a mesmo
     // se não tiver cria uma e salva no banco atrelada ao numero como aberta
 
-    let sessionId;
+    /* let sessionId;
     if (sessionInProgress) {
       console.log("if");
       sessionId = sessionInProgress.id;
@@ -57,7 +58,7 @@ export class DialogflowService implements IAIQuestionAnswering {
       console.log("else");
       sessionId = v4();
       await this.databaseService.createSession(telefoneCliente);
-    }
+    } */
 
     const client = new SessionsClient({
       keyFilename: process.env.DIALOGCREDENTIALS,
@@ -69,7 +70,7 @@ export class DialogflowService implements IAIQuestionAnswering {
       projectId,
       location,
       agentId,
-      sessionId
+      session
     );
 
     // Read the content of the audio file and send it as part of the request.
@@ -114,12 +115,9 @@ export class DialogflowService implements IAIQuestionAnswering {
 
   async detectIntentText(
     telefoneCliente: string,
-    message: string
+    message: string,
+    session: string
   ): Promise<MessageDialogFlow[] | any> {
-    const session = await this.databaseService.getSessionOpened(
-      telefoneCliente
-    );
-
     console.log(session);
 
     // Se a Pessoa já foi atendida ele não inicia o atendimento.
@@ -136,7 +134,7 @@ export class DialogflowService implements IAIQuestionAnswering {
     // se não tiver cria uma e salva no banco atrelada ao numero como aberta
     if (session) {
       console.log("if");
-      sessionId = session.id;
+      sessionId = session;
     } else {
       console.log("else");
       sessionId = v4();

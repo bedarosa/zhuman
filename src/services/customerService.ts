@@ -6,12 +6,21 @@ export class CustomerService {
   constructor() {}
 
   async getCustomerById(id: number) {
-    const customerById = await prisma.customer.findFirst({
+    const customer = await prisma.customer.findFirst({
       where: {
         id: id,
       },
     });
-    console.log(customerById);
-    return customerById;
+    console.log(customer);
+    return customer;
+  }
+
+  async getCustomerByPhone(phone: string) {
+    const customer = await prisma.customer.findFirst({
+      where: {
+        phone: phone,
+      },
+    });
+    return customer;
   }
 }
