@@ -70,6 +70,7 @@ export class ConversationBotController implements IConversationBot {
         MediaContentType0,
         session
       );
+
       // Transformar em metodo.
       for (const message of response) {
         try {
