@@ -13,11 +13,13 @@ export class TwilioService implements IMessages {
   constructor() {
     this.client = twilio(accountSid, authToken);
   }
-  async sendWhatsApp(message: Message): Promise<any> {
+  async sendWhatsApp(message: Message): Promise<void> {
     await this.client.messages.create({
       body: `${message.body}`,
       from: message.from,
       to: message.to,
     });
   }
+
+  async sendWhatsAppDialogFlow(): Promise<void> {}
 }
