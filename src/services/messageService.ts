@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { IMessageDatabase } from "../interfaces/IMessageDatabase";
-import { IMessages } from "../interfaces/IMessages";
 
 const prisma = new PrismaClient();
 
@@ -11,15 +10,19 @@ export class MessageService implements IMessageDatabase {
     conversa_id: number,
     sender_id: number,
     recipient_id: number,
-    intentions: string
+    message_text: string,
+    intentions: string | null,
+    lida: null
   ) {
     const message = await prisma.mensagens_bot_trilha.create({
       data: {
         conversa_id: conversa_id,
         sender_id: sender_id,
         recipient_id: recipient_id,
-        sent_at: new Date(),
+        message_text: message_text,
         intentions: intentions,
+        lida: lida,
+        sent_at: new Date(),
       },
     });
     return message;

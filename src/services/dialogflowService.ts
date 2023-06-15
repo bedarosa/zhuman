@@ -1,11 +1,12 @@
 import dotenv from "dotenv";
-import { MessageDialogFlow } from "../../types";
+import { MessageDialogFlow, ResponseObjectDialogFlow } from "../../types";
 import { v4 } from "uuid";
-// import { SessionService } from "./sessionService";
 import { TwilioService } from "./twilioService";
 import { IAIQuestionAnswering } from "../interfaces/IAIQuestionAnswering ";
 import fs from "fs";
 import util from "util";
+import { MessageService } from "./messageService";
+import { ConversationService } from "./conversaService";
 
 dotenv.config();
 /**
@@ -26,11 +27,13 @@ const location = process.env.LOCATION;
   apiEndpoint: "us-central1-dialogflow.googleapis.com",
 }); */
 export class DialogflowService implements IAIQuestionAnswering {
-  databaseService: any;
+  conversaService: any;
+  messageService: any;
   twilioService: any;
   constructor() {
-    // this.databaseService = new SessionService();
-    this.twilioService = new TwilioService();
+    this.conversaService = new ConversationService();
+    this.messageService = new MessageService();
+    this.twilioService = new TwilioService(this.messageService);
   }
 
   async detectIntentAudio(
@@ -39,27 +42,6 @@ export class DialogflowService implements IAIQuestionAnswering {
     MediaContentType: string,
     session: string
   ): Promise<any> {
-    //const filename = pathAudio;
-    //const extensaoMedia = MediaContentType.split("/")[1];
-
-    /* const sessionInProgress = await this.databaseService.getSessionOpened(
-      telefoneCliente
-    ); */
-
-    // verifica se o numero já tem uma sessionID em aberto
-    // se tiver envia a mesmo
-    // se não tiver cria uma e salva no banco atrelada ao numero como aberta
-
-    /* let sessionId;
-    if (sessionInProgress) {
-      console.log("if");
-      sessionId = sessionInProgress.id;
-    } else {
-      console.log("else");
-      sessionId = v4();
-      await this.databaseService.createSession(telefoneCliente);
-    } */
-
     const client = new SessionsClient({
       keyFilename: process.env.DIALOGCREDENTIALS,
       apiEndpoint: process.env.APIENDPOINT,
@@ -101,7 +83,7 @@ export class DialogflowService implements IAIQuestionAnswering {
         console.log(`Agent Response: ${message.text.text}`);
       }
     }
-    if (response.queryResult.match.intent) {
+    if (response.queryResult.match?.intent) {
       console.log(
         `Matched Intent: ${response.queryResult.match.intent.displayName}`
       );
@@ -110,11 +92,10 @@ export class DialogflowService implements IAIQuestionAnswering {
       `Current Page: ${response.queryResult.currentPage.displayName}`
     );
 
-    return response.queryResult.responseMessages as MessageDialogFlow[];
+    return response as any;
   }
 
   async detectIntentText(
-    telefoneCliente: string,
     message: string,
     session: string
   ): Promise<MessageDialogFlow[] | any> {
@@ -138,7 +119,7 @@ export class DialogflowService implements IAIQuestionAnswering {
     } else {
       console.log("else");
       sessionId = v4();
-      await this.databaseService.createSession(telefoneCliente);
+      await this.messageService.createSession(sessionId);
     }
 
     console.log(sessionId);
@@ -167,7 +148,7 @@ export class DialogflowService implements IAIQuestionAnswering {
     const [response] = await client.detectIntent(request);
 
     if (response.queryResult.match.intent?.displayName == "fim.fazer") {
-      await this.databaseService.finishSession(sessionId);
+      await this.conversaService.finishConversation(sessionId);
     }
     //console.log("Aqui!");
     for (const message of response.queryResult.responseMessages) {
@@ -183,6 +164,6 @@ export class DialogflowService implements IAIQuestionAnswering {
     console.log(
       `Current Page: ${response.queryResult.currentPage.displayName}`
     );
-    return response.queryResult.responseMessages as MessageDialogFlow[];
+    return response as any;
   }
 }

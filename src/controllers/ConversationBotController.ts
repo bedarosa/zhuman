@@ -1,5 +1,5 @@
 import * as express from "express";
-import { Message } from "../../types";
+import { ResponseObjectDialogFlow } from "../../types";
 import { IAIQuestionAnswering } from "../interfaces/IAIQuestionAnswering ";
 import { IConversationBot } from "../interfaces/IConversationBot";
 import { IConversationDatabase } from "../interfaces/IConversationDatabase";
@@ -7,6 +7,14 @@ import { ICustomerDatabase } from "../interfaces/ICustomerDatabase";
 import { IDownloadMedia } from "../interfaces/IDownloadMedia";
 import { IMessageDatabase } from "../interfaces/IMessageDatabase";
 import { IMessages } from "../interfaces/IMessages";
+
+interface Buffer {
+  messages: string[];
+  timer: NodeJS.Timeout | any;
+}
+
+const messageBuffers: { [key: string]: Buffer } = {};
+const WAIT_TIME = 15000;
 
 export class ConversationBotController implements IConversationBot {
   constructor(
@@ -18,44 +26,61 @@ export class ConversationBotController implements IConversationBot {
     private customerDatabase: ICustomerDatabase
   ) {}
 
-  async conversation(
+  // Mudar para conversation
+  async conversa(
     req: express.Request,
-    res: express.Response
-  ): Promise<void> {
-    const { Body, From, To, MediaUrl0, MediaContentType0 } = req.body;
-    // const telefoneFormatado = From.replace(/\D/g, "");
-    const telefoneFormatado = "985747852";
-
+    res: express.Response,
+    Body: string,
+    From: string,
+    To: string,
+    telefoneFormatado: string,
+    MediaUrl0: string,
+    MediaContentType0: string
+  ) {
     let conversation;
     let session;
-    let customer;
 
     // Checar se tem uma sessão, se tem e estiver fechada ignora
     // se tiver e estiver aberta enviar a sessão ao DG
 
     // Id da conversa tem que ser uma guid
-    const conversationId =
-      await this.conversationDatabase.getConversationByPhone(telefoneFormatado);
+    let conversationId = await this.conversationDatabase.getConversationByPhone(
+      telefoneFormatado
+    );
+
     // Se ele tem uma sessão e esta fechada não leva pra frente.
     if (conversationId && conversationId.session_open == false) {
-      res.sendStatus(200);
+      res.send({ Message: "teste" });
       return;
     }
     // Se não tem, nem nunca teve, abre uma sessão (Conversa).
+    const customer = await this.customerDatabase.getCustomerByPhone(
+      telefoneFormatado
+    );
     if (!conversationId) {
-      customer = await this.customerDatabase.getCustomerByPhone(
-        telefoneFormatado
-      );
       conversation = await this.conversationDatabase.createConversation(
         customer.id
       );
       session = conversation.id; //mudar o conversationID para GUID
+      conversationId = conversation?.id;
     } else {
       session = conversationId.id;
+      conversationId = conversationId.id;
     }
-    console.log(session);
-    console.log(session);
+
     // Alterar a conversationID que envia pro DG pelo id da conversa do banco
+    try {
+      const message = await this.messageDatabase.createMessage(
+        conversationId,
+        Number(customer.id),
+        9999,
+        String(Body),
+        null,
+        null
+      );
+    } catch (error) {
+      console.error(error);
+    }
 
     if (MediaUrl0 || MediaContentType0) {
       const audio = await this.downloadMedia.downloadAudio(
@@ -64,80 +89,44 @@ export class ConversationBotController implements IConversationBot {
         MediaContentType0
       );
 
-      const response = await this.interpretMessage.detectIntentAudio(
+      const response: any = await this.interpretMessage.detectIntentAudio(
         telefoneFormatado,
         audio,
         MediaContentType0,
         session
       );
 
-      // Transformar em metodo.
-      for (const message of response) {
-        try {
-          if (message.text) {
-            try {
-              // Salvar no banco.
-              const saveMessage = await this.messageDatabase.createMessage(
-                conversation,
-                1, // Id do Bot
-                customer.id, // Id do cliente
-                message.text.text
-              );
-              const mensagem: Message = {
-                body: message.text.text,
-                from: From,
-                to: To,
-              };
-              this.messageSender.sendWhatsApp(mensagem);
-              console.log(saveMessage);
-            } catch (error) {
-              console.error(error);
-            }
-          }
-        } catch (error) {}
-      }
-      res.sendStatus(200);
+      await this.messageSender.sendWhatsAppDialogFlow(
+        response,
+        From,
+        To,
+        Number(customer.id),
+        conversationId
+      );
+
+      res.send({ Message: "teste" });
       return;
     }
 
-    const response = await this.interpretMessage.detectIntentText(
-      telefoneFormatado,
+    const response: any = await this.interpretMessage.detectIntentText(
       Body,
       session
     );
 
     // Se response retornar vazio o usuario não obtem resposta
     /* if (!response) {
-      res.sendStatus(200);
+      res.sendStatus(201);
       return;
     } */
 
-    for (const message of response) {
-      try {
-        if (message.text) {
-          try {
-            const saveMessage = await this.messageDatabase.createMessage(
-              conversation,
-              1, // Id do Bot
-              customer.id, // Id do cliente
-              message.text.text
-            );
-            const mensagem: Message = {
-              body: message.text.text,
-              from: From,
-              to: To,
-            };
-            this.messageSender.sendWhatsApp(mensagem);
-            console.log(saveMessage);
-          } catch (error) {
-            console.error(error);
-          }
-        }
-      } catch (error) {}
-    }
-
-    //this.messageSender.sendWhatsApp(message);
-    res.sendStatus(200);
+    await this.messageSender.sendWhatsAppDialogFlow(
+      response,
+      From,
+      To,
+      Number(customer.id),
+      conversationId
+    );
+    res.send({ Message: "teste" });
     return;
   }
 }

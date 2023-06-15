@@ -3,6 +3,8 @@ export interface IMessageDatabase {
     conversa_id: number,
     sender_id: number,
     recipient_id: number,
-    intentions: string
+    message_text: string,
+    intentions: string | null,
+    lida: null
   ): any;
 }

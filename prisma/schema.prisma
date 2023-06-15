@@ -540,27 +540,6 @@ model notifications_notificationcategory {
   notifications_notification notifications_notification[]
 }
 
-model oauth2_factorial {
-  id            Int      @id @default(autoincrement())
-  access_token  String   @db.VarChar(45)
-  token_type    String   @db.VarChar(45)
-  expires_in    Int
-  refresh_token String   @db.VarChar(45)
-  scope         String   @db.VarChar(12)
-  created_at    DateTime @db.DateTime(0)
-}
-
-model opportunities {
-  id       BigInt @id @default(autoincrement())
-  creator  Int?
-  owner    Int?
-  executor Int?
-  details  Json?
-  stage    Int?   @default(1)
-  priority Int?   @default(1)
-  account  Int?
-}
-
 model opportunities_historicalopportunity {
   id                    BigInt
   created_time          DateTime  @db.DateTime(6)
@@ -599,20 +578,6 @@ model opportunities_historicalopportunitycomment {
   author_id             Int?
   history_user_id       Int?
   opportunity_id        BigInt?
-}
-
-model opportunities_historicalopportunitypriority {
-  id                    Int
-  name                  String         @db.VarChar(140)
-  history_id            Int            @id @default(autoincrement())
-  history_date          DateTime       @db.DateTime(6)
-  history_change_reason String?        @db.VarChar(100)
-  history_type          String         @db.VarChar(1)
-  history_user_id       Int?
-  users_usuario         users_usuario? @relation(fields: [history_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "opportunities_histor_history_user_id_204fb110_fk_users_usu")
-
-  @@index([history_user_id], map: "opportunities_histor_history_user_id_204fb110_fk_users_usu")
-  @@index([id], map: "opportunities_historicalopportunitypriority_id_9d38a83c")
 }
 
 model opportunities_historicalopportunitystage {
@@ -684,17 +649,6 @@ model opportunities_opportunitystep {
 
   @@index([sector_id], map: "opportunities_steps_sector_63f90adb_fk_users_companysectors_id")
   @@index([stage_id], map: "opportunities_steps_stage_a70018fe_fk_opportunities_stages_id")
-}
-
-model opportunity_priorities {
-  id   Int    @id @default(autoincrement())
-  name String @db.VarChar(140)
-}
-
-model opportunity_stages {
-  id       Int     @id @default(autoincrement())
-  name     String  @db.VarChar(140)
-  complete Boolean
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -1001,17 +955,6 @@ model taggit_taggeditem {
   @@index([tag_id], map: "taggit_taggeditem_tag_id_f4f5b767_fk_taggit_tag_id")
 }
 
-model team_id_factorial {
-  id                                                                                                       Int                                 @id
-  nome_time                                                                                                String                              @db.VarChar(20)
-  users_usuario_factorial_teams_ids_users_usuario_factorial_teams_ids_team_id_factorialToteam_id_factorial users_usuario_factorial_teams_ids[] @relation("users_usuario_factorial_teams_ids_team_id_factorialToteam_id_factorial")
-}
-
-model teams_factorial {
-  id   Int    @id
-  name String @db.VarChar(45)
-}
-
 model token_blacklist_blacklistedtoken {
   id                               Int                              @id @default(autoincrement())
   blacklisted_at                   DateTime                         @db.DateTime(6)
@@ -1030,14 +973,6 @@ model token_blacklist_outstandingtoken {
   users_usuario                    users_usuario?                    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "token_blacklist_outs_user_id_83bc629a_fk_users_usu")
 
   @@index([user_id], map: "token_blacklist_outs_user_id_83bc629a_fk_users_usu")
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model user_farmer {
-  id            Int
-  pipe_name     String?       @db.VarChar(30)
-  @@index([id], map: "id")
-  @@ignore
 }
 
 model user_sessions_session {
@@ -1422,7 +1357,6 @@ model users_usuario {
   messaging_message                            messaging_message[]
   messaging_userthread                         messaging_userthread[]
   notifications_notification                   notifications_notification[]
-  opportunities_historicalopportunitypriority  opportunities_historicalopportunitypriority[]
   reversion_revision                           reversion_revision[]
   servicedesk_historicalcomment                servicedesk_historicalcomment[]
   servicedesk_historicalticket                 servicedesk_historicalticket[]
@@ -1437,44 +1371,11 @@ model users_usuario {
   users_historicaltime                         users_historicaltime[]
   assessor_level                               assessor_level?                                @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_usuario_level_id_8b68ebfa_fk_assessor_level_id")
   users_assessorlideranca                      users_assessorlideranca?                       @relation(fields: [level_lid_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_usuario_level_lid_id_b5ff1c29_fk_users_ass")
-  users_usuario_factorial                      users_usuario_factorial[]
   users_usuario_groups                         users_usuario_groups[]
   users_usuario_user_permissions               users_usuario_user_permissions[]
 
   @@index([level_id], map: "users_usuario_level_id_8b68ebfa_fk_assessor_level_id")
   @@index([level_lid_id], map: "users_usuario_level_lid_id_b5ff1c29_fk_users_ass")
-}
-
-model users_usuario_factorial {
-  id                                Int                                 @id @unique(map: "id") @default(autoincrement())
-  idFactorial                       Int
-  idAvel                            Int?
-  first_name                        String                              @db.VarChar(30)
-  last_name                         String                              @db.VarChar(40)
-  full_name                         String                              @db.VarChar(70)
-  email                             String                              @db.VarChar(50)
-  phone_number                      String                              @db.VarChar(15)
-  terminated_on                     DateTime?                           @db.DateTime(0)
-  identifier                        String                              @db.VarChar(20)
-  identifier_type                   String                              @db.VarChar(20)
-  gender                            String                              @db.VarChar(20)
-  bank_number                       String                              @db.VarChar(20)
-  manager_id                        Int?
-  company_identifier                Int?
-  users_usuario                     users_usuario?                      @relation(fields: [idAvel], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_usuario_factorial_ibfk_1")
-  users_usuario_factorial_teams_ids users_usuario_factorial_teams_ids[]
-
-  @@index([idAvel], map: "idAvel")
-}
-
-model users_usuario_factorial_teams_ids {
-  user_id                                                                                  Int
-  team_id_factorial                                                                        Int
-  users_usuario_factorial                                                                  users_usuario_factorial @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_usuario_factorial_teams_ids_ibfk_1")
-  team_id_factorial_users_usuario_factorial_teams_ids_team_id_factorialToteam_id_factorial team_id_factorial       @relation("users_usuario_factorial_teams_ids_team_id_factorialToteam_id_factorial", fields: [team_id_factorial], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_usuario_factorial_teams_ids_ibfk_2")
-
-  @@id([user_id, team_id_factorial])
-  @@index([team_id_factorial], map: "team_id_factorial")
 }
 
 model users_usuario_groups {
@@ -1517,8 +1418,19 @@ model mensagens_bot_trilha {
   sender_id            Int?
   recipient_id         Int?
   sent_at              DateTime?             @db.DateTime(0)
+  message_text         String?               @db.Text
   intentions           String?               @db.VarChar(45)
+  lida                 Int?                  @db.TinyInt
   conversas_bot_trilha conversas_bot_trilha? @relation(fields: [conversa_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mensagens_bot_trilha_ibfk_1")
 
   @@index([conversa_id], map: "conversa_id")
+}
+
+model consultoria_info {
+  id           BigInt  @id @default(autoincrement())
+  consultor_id BigInt
+  fb_positivo  BigInt?
+  fb_negativo  BigInt?
+  retorno      BigInt?
+  ancord       Int?    @db.TinyInt
 }

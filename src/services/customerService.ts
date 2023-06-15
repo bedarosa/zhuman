@@ -26,4 +26,16 @@ export class CustomerService implements ICustomerDatabase {
     });
     return customer;
   }
+
+  async getCustomerTrilhaByPhone(phone: string) {
+    const customer = await prisma.customer.findFirst({
+      where: {
+        phone: {
+          contains: phone,
+        },
+        lost_reason: "210",
+      },
+    });
+    return customer;
+  }
 }
