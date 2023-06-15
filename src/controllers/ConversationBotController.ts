@@ -1,4 +1,6 @@
 import * as express from "express";
+import { ParamsDictionary } from "express-serve-static-core";
+import { ParsedQs } from "qs";
 import { ResponseObjectDialogFlow } from "../../types";
 import { IAIQuestionAnswering } from "../interfaces/IAIQuestionAnswering ";
 import { IConversationBot } from "../interfaces/IConversationBot";
@@ -26,8 +28,10 @@ export class ConversationBotController implements IConversationBot {
     private customerDatabase: ICustomerDatabase
   ) {}
 
+  // Mudar nome para algo relacionado a espera
+
   // Mudar para conversation
-  async conversa(
+  async conversation(
     req: express.Request,
     res: express.Response,
     Body: string,
